@@ -1,4 +1,5 @@
 const express = require("express");
+const {userController, followerController} = require("../../controllers")
 
 const router = express.Router();
 
@@ -10,21 +11,22 @@ router.put("/:user_id", (req, res)=>{
 });
 
 //
-router.delete("/:user_id", (req, res)=>{
-    const userId = req.params.user_id;
-    console.log("logout");
-    res.json({ message: `user deleted with ID: ${userId}` });
-})
+router.delete("/:user_id", userController.userDeleteController)
 
-router.put("/:user_id/change-password", (req, res)=>{
-    const userId = req.params.user_id;
-    console.log("register");
-    res.json({ message: `Password changed for user with ID: ${userId}` });
-});
+router.put("/:user_id/change-password", userController.userPasswordController);
 
 router.get("/search", (req, res)=>{
     return res.json({
         success:true
     })
 })
+
+router.get("/:user_id/follower", followerController.followerController);
+
+router.get("/:user_id/following", followerController.followingController);
+
+router.post("/:user_id/follow", followerController.followController);
+
+router.post("/:user_id/unfollow", followerController.unfollowController);
+
 module.exports = router;
