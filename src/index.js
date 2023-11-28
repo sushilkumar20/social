@@ -3,7 +3,7 @@ const routes = require("./routes");
 const {serverConfig} = require("./config");
 const { json } = require("sequelize");
 
-const PORT = 3000;
+const PORT = 3005;
 const app  = express();
 
 app.use(express.json());
