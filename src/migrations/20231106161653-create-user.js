@@ -9,15 +9,14 @@ module.exports = {
         unique:true,
         type: Sequelize.STRING
       },
-      id: {
-        allowNull: false,
-        unique:true,
-        type: Sequelize.STRING
-      },
       username: {
         allowNull: false,
         unique:true,
         type: Sequelize.STRING
+      },
+      name: {
+        type:Sequelize.STRING,
+        allowNull: false,
       },
       email: {
         allowNull: false,
@@ -30,6 +29,12 @@ module.exports = {
       },
       bio: {
         type: Sequelize.STRING
+      },
+      location: {
+        type:Sequelize.STRING,
+      },
+      externalLink: {
+        type:Sequelize.STRING,
       },
       created_at: {
         allowNull: false,

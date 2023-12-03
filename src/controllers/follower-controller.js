@@ -1,4 +1,5 @@
 const {followService, userSession, userServices} = require("../services");
+const{commonUtils} = require("../utils");
 
 async function getAllFollower(req,res){
    
@@ -54,21 +55,23 @@ async function follow(req,res){
             email:email,
         })
 
-        if(userSession.getUser(user.id) == key){
+        if(commonUtils.validate(key)){
             const userToFollow  =  await userServices.userGetter({
                 email:followerEmail,
             })
-    
-            if(userToFollow == undefined){
+
+
+            if(userToFollow == undefined || userToFollow == -1){
                 res.status(400).json({
                     message :"user doesnot exist"
                 })
             }else{
                 const response = await followService.follow({
-                    followerId : user.id,
-                    followingId : userToFollow.id
+                    follower : user,
+                    following : userToFollow
                 });
-    
+
+                
                 res.json({
                     message : "succesfully followed",
                     data : response
@@ -99,19 +102,19 @@ async function unfollow(req,res){
             email:email,
         })
 
-        if(userSession.getUser(user.id) == key){
+        if(commonUtils.validate(key)){
             const userToFollow  =  await userServices.userGetter({
                 email:followerEmail,
             })
     
-            if(userToFollow == undefined){
+            if(userToFollow == undefined || userToFollow == -1){
                 res.status(400).json({
                     message :"user doesnot exist"
                 })
             }else{
                 const response = await followService.unfollow({
-                    followerId : user.id,
-                    followingId : userToFollow.id
+                    followerId : user,
+                    followingId : userToFollow
                 });
     
                 res.json({

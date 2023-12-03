@@ -1,4 +1,7 @@
 const {userServices, userSession} = require("../services");
+const {commonUtils} = require("../utils");
+
+
 async function updateUser(req, res){
 
 }
@@ -11,7 +14,7 @@ async function deleteUser(req, res){
 
         const user = await userServices.userGetter({email:email});
 
-        if(userSession.getUser(user.id) === key){
+        if(commonUtils.validate(key)){
             const deleteResponse = await userServices.deleteUser(user.id);
             userSession.removeUser(user.id);
             res.json({
@@ -39,7 +42,7 @@ async function updatePassword(req, res){
        
         const user = await userServices.userGetter({email:email});
     
-        if(userSession.getUser(user.id) === key){
+        if(commonUtils.validate(key)){
     
             const updateResp = await userServices.updatePassword({
                 email:email,
@@ -70,6 +73,15 @@ async function updatePassword(req, res){
     
 }
 
+function checkUser(token, user){
+
+    try{
+        const data = commonUtils.validateToken(token);
+        return true;
+    }catch(error){
+        
+    }
+}
 
 module.exports = {
     userDeleteController : deleteUser,

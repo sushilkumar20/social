@@ -1,5 +1,6 @@
 const {UserRepository} = require("../repositories");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 const userRepository = new UserRepository();
 
@@ -64,16 +65,7 @@ async function updateUser(data){
         if(usersData.length >0){
             let user = usersData[0].dataValues;
         
-            const updateResponse = await userRepository.update(user.id,{
-                id:id,
-                username:req.body.username,
-                email:req.body.email,
-                password:hashedPassword(req.body.password),
-                bio: req.body.bio,
-                created_at : createdAt,
-                updated_at: updatedAt,
-                Type: "user"
-            })
+            const updateResponse = await userRepository.update(user.id, data)
         }else{
             return "-1";
         }
@@ -112,10 +104,7 @@ async function deleteUser(data){
 
 
 function validatePassword(passwordFromUser, passwordStored){
-    const dataToHash = passwordFromUser;
-    const hash = crypto.createHash('sha256');
-    hash.update(dataToHash);
-    return hash.digest('hex') === passwordStored;
+    return  bcrypt.compareSync(passwordFromUser, passwordStored);
 }
 
 function hashPassword(passwordFromUser){
@@ -130,5 +119,6 @@ module.exports = {
     userGetter,
     deleteUser,
     updatePassword,
-    userGetterById
+    userGetterById,
+    updateUser
 }

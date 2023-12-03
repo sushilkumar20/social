@@ -8,7 +8,15 @@ async function follow(data){
 
     // check if following id is blockked or not
     try{
-        followerRepository.create(data);
+        followerRepository.create({
+            followerId : data.follower.id,
+            followingId : data.following.id
+        });
+
+        data.follower.Following  = data.follower.Following + 1;
+        data.following.Follower  = data.following.Follower + 1;
+        userServices.updateUser(data.follower);
+        userServices.updateUser(data.following);
     }catch(error){
         throw error;
     }
@@ -18,7 +26,14 @@ async function unfollow(data){
 
     // check if following id is blockked or not
     try{
-        return followerRepository.destroy(data);
+         followerRepository.destroy({
+            followerId : data.follower.id,
+            followingId : data.following.id
+        });
+        data.follower.Following  = data.follower.Following - 1;
+        data.following.Follower  = data.following.Follower - 1;
+        userServices.updateUser(data.follower);
+        userServices.updateUser(data.following);
     }catch(error){
         throw error;
     }

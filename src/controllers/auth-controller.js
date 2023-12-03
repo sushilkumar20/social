@@ -1,24 +1,35 @@
 const {userServices, userSession} = require("../services");
 const crypto = require("crypto");
 const { v4: uuidv4 } = require('uuid');
+const {commonUtils} = require("../utils");
 
 async function register(req,res){
     try{
-        let id = createId(req.body.userName, req.body.email);
+        let id = commonUtils.createId(req.body.userName, req.body.email);
         const createdAt =  new Date();
         const updatedAt = createdAt; 
         var data = await userServices.createUser({
-            id:id,
+            id: id,
             username:req.body.username,
             email:req.body.email,
-            password:hashedPassword(req.body.password),
+            password:req.body.password,
             bio: req.body.bio,
             created_at : createdAt,
             updated_at: updatedAt,
-            Type: "user"
+            Type: "user",
+            location : req.body.location,
+            externalLink : req.body.externalLink,
+            name : req.body.name
         });
-        const sessionId = uuidv4();
-        userSession.setUser(data.id, sessionId);
+        // const sessionId = uuidv4();
+        // userSession.setUser(data.id, sessionId);
+
+        const sessionId = commonUtils.createToken({
+            id:data.id,
+            userName : data.userName,
+            name : data.name,
+            email:data.email
+        })
         res.json({ message: "success registered" ,
                    user:data,
                    key : sessionId
@@ -48,8 +59,15 @@ async function login(req,res){
             })
         }else{
 
-            const sessionId = uuidv4();
-            userSession.setUser(data.id, sessionId);
+            // const sessionId = uuidv4();
+            // userSession.setUser(data.id, sessionId);
+
+            const sessionId = commonUtils.createToken({
+                id:data.id,
+                userName : data.userName,
+                name : data.name,
+                email:data.email
+            })
             res.json({
                 message :"succeesfully signed",
                 data : data,
@@ -66,11 +84,11 @@ async function login(req,res){
 
 async function logout(req,res){
     try{
-        const sessionIdFromUser = req.body.key;
+        const sessionIdFromUser = req.headers.key;
         let data = await userServices.userGetter({email : req.body.email});
-        const sessionId = userSession.getUser(data.id);
+        // const sessionId = userSession.getUser(data.id);
         
-        if(sessionId === sessionIdFromUser){
+        if(commonUtils.validate(sessionIdFromUser)){
             userSession.removeUser(data.id);
             res.json({
                 message : "Succesfully logged out"
@@ -87,19 +105,6 @@ async function logout(req,res){
     }
           
 };
-function createId(userName, email){
- const dataToHash = userName + email;
-  const hash = crypto.createHash('sha256');
-  hash.update(dataToHash);
-  return hash.digest('hex');
-}
-
-function hashedPassword(password){
-  const dataToHash = password;
-  const hash = crypto.createHash('sha256');
-  hash.update(dataToHash);
-  return hash.digest('hex');
-}
 
 module.exports  = {
     registerController : register,
